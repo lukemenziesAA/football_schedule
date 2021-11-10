@@ -1,3 +1,81 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep 13 14:29:57 2021
+
+@author: Luke Menzies
+"""
+
+from pulp import LpProblem, LpMaximize, LpVariable, lpSum, LpStatus, value
+from pandas import DataFrame
+from functools import reduce
+from math import ceil
+
+
+def find_pos(slot, person, roles, day, assignments):
+    for role in roles:
+        if value(assignments[slot, person, role, day]) == 1:
+            out = role
+            break
+        else:
+            out = None
+    return out
+
+
+def get_slots(day, person, slots, roles, assignments):
+    return list(map(lambda slot: find_pos(slot, person, roles, day,
+                                          assignments),
+                    range(slots)))
+
+
+def get_days(days, person, slots, roles, assignments):
+    return reduce(lambda acc, ele: acc + ele,
+                  list(map(lambda day: get_slots(day, person, slots, roles,
+                                                 assignments),
+                           range(days))), [])
+
+
+def get_persons(slots, players, roles, days, assignments):
+    return list(map(lambda person: get_days(days, person, slots, roles,
+                                            assignments), players))
+
+
+# Each role is assigned to exactly one person
+# Nobody is assigned multiple roles in the same time slot
+# Nobody is assigned a role in a slot they are on sub for
+# Nobody plays for more than 20 minutes
+# 4 slots in a game (4*10min slot)
+
+
+# Parameters
+slots = 4
+days = 10
+players = players = ["Charlie", "Jim", "Elsie", "Tim", "Mo",
+                     "Raz", "Juan", "Sam"]  # 8 players
+players_len = len(players)
+roles = ["GK", "LM", "RM", "D", "F"]
+match_slots = slots * len(roles)
+max_assignments_per_person = ceil(match_slots/players_len)
+min_slots_per_person = (max_assignments_per_person - 1)
+
+# Number of players has be greater than or equals to the number of roles
+if (len(players) < len(roles)):
+    print(f'Currently, there are only {len(players)} players, for optimal' + \
+          ' solution a minimum number of {len(roles)} players is required')
+
+# Create the 'problem'
+problem = LpProblem("rota_generator", LpMaximize)
+
+# Create variables
+assignments = LpVariable.dicts("A", ((slot, person, role, day)
+                                     for slot in range(slots)
+                                     for person in players
+                                     for role in roles
+                                     for day in range(days)), cat="Binary")
+
+
+# Add objective
+obj = []
+for slot in range(slots):
     for person in players:
         for role in roles:
             for day in range(days):
