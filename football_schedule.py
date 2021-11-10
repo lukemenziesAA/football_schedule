@@ -42,7 +42,7 @@ def get_persons(slots, players, roles, days, assignments):
 # Each role is assigned to exactly one person
 # Nobody is assigned multiple roles in the same time slot
 # Nobody is assigned a role in a slot they are on sub for
-# Nobody plays for more than 20 minutes
+# Nobody plays for more than 30 minutes
 # 4 slots in a game (4*10min slot)
 
 
