@@ -49,8 +49,8 @@ def get_persons(slots, players, roles, days, assignments):
 # Parameters
 slots = 4
 days = 10
-players = players = ["Charlie", "Jim", "Elsie", "Tim", "Mo",
-                     "Raz", "Juan", "Sam"]  # 8 players
+players = players = ["Charlie", "Jim", "Elsie", "Ruby", "Tim", "Mo",
+                     "Raz", "Juan"]  # 8 players
 players_len = len(players)
 roles = ["GK", "LM", "RM", "D", "F"]
 match_slots = slots * len(roles)
